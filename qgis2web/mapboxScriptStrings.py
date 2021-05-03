@@ -362,8 +362,11 @@ def titleSubScript(webmap_head):
 def addLayersList(basemapList, matchCRS, layer_list, cluster, legends,
                   collapsed):
     layerName_list = []
+    QgsMessageLog.logMessage(str(legends))
     for ct, layer in enumerate(layer_list):
-        sln = "'lyr_%s_%d_0', '%s'" % (safeName(layer.name()), ct,
+        
+        legendHTML = ("<div class=\"menu-legend\">" + legends[safeName(layer.name()) + "_" + str(ct)] + "</div>")
+        sln = ("'lyr_%s_%d_0', '%s"+legendHTML.replace("'", "\'")+"'") % (safeName(layer.name()), ct,
                                        layer.name())
         layerName_list.insert(0, sln)
     layersList = """
@@ -377,7 +380,7 @@ def addLayersList(basemapList, matchCRS, layer_list, cluster, legends,
         link.href = '#';
         link.className = 'active';
         link.layer = id;
-        link.textContent = layerName;
+        link.innerHTML = layerName;
 
         link.onclick = function (e) {
             var clickedLayer = this.layer;

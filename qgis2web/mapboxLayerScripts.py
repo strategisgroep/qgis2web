@@ -321,7 +321,7 @@ def getPopups(layer, safeLayerName, highlight, popupsOnHover, popup, vts):
     field_vals = popup.values()
     table = ""
     for field in popup:
-        tablestart = "'<table>\\"
+        tablestart = "'<h6>" + layer.name() + "</h6><table>\\"
         row = ""
         for field, val in zip(field_names, field_vals):
             fieldIndex = fields.indexFromName(unicode(field))
