@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        @CSSADDRESS@
+        @EXTRACSS@
+        @LEAFLET_CLUSTERCSS@
+        @LEAFLET_LAYERSEARCHCSS@
+        @LEAFLET_LAYERFILTERCSS@
+        @LEAFLET_ADDRESSCSS@
+        @LEAFLET_MEASURECSS@
+        @OL3_BACKGROUNDCOLOR@
+        @OL3_GEOCODINGLINKS@
+        @OL3_MEASURESTYLE@
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>Dashboard - @PAGETITLE@</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	    <link href="https://3dcityplanner.com/css/custom.css" rel="stylesheet">
+        <link href="https://3dcityplanner.com/ler/dashboard.css" rel="stylesheet">
+        <link rel="shortcut icon" type="image/ico" href="https://3dcityplanner.com/images/favicon.ico" /> 
+        <style>
+            #menu {
+                font-family: 'Poppins', sans-serif !important;
+                overflow: hidden;
+                border-radius: 8px;
+                max-height: 95%;
+                overflow-y: auto;
+            }
+            #menu a::before {content: "◻"; padding-right: 5px;}
+            #menu a.active::before {content: "◼"; padding-right: 5px;}
+            #menu a .menu-legend{
+                border-top: 1px solid lightgrey;
+                padding-top:5px;
+                margin-left:20px;
+                margin-top:5px;
+                display: none;
+            }
+            #menu a.active .menu-legend{
+                display: block;
+            }
+            #menu a.active{
+                background-color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="h-100 w-100">
+            <nav class="navbar navbar-expand-lg navbar-light white-bg px-5" >
+                    <a class="navbar-brand" href="/ler"><img src="https://3dcityplanner.com/images/logo_strategis_ter.png" class="img-fluid" alt=""></a>
+                    <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item"><div class="nav-link scroll-link" style="pointer-events:none;"><h3>Dashboard - @PAGETITLE@</h3></div></li>
+                        </ul>
+                    </div>
+            </nav>
+            <div style="position:fixed; bottom:0; top:86px; display:flex; width:100%;">
+                <div id="map" class="position-relative h-100 w-100">
+                    @OL3_POPUP@
+                </div>
+            </div>
+        </div>
+        @EXP_JS@
+        @OL3_PROJ4@
+        @OL3_PROJDEF@
+        @JSADDRESS@
+        @LEAFLET_EXTRAJS@
+        @LEAFLET_ADDRESSJS@
+        @LEAFLET_MEASUREJS@
+        @LEAFLET_CRSJS@
+        @OL3_LAYERSWITCHER@
+        @OL3_GEOCODINGJS@
+        @LEAFLET_CLUSTERJS@
+        @LEAFLET_LAYERSEARCHJS@
+        @LEAFLET_LAYERFILTERJS@
+        @OL3_GEOJSONVARS@
+        @OL3_STYLEVARS@
+        @OL3_LAYERS@ 
+        @QGIS2WEBJS@
+        @OL3_WFSVARS@@MBGLJS_MEASURE@@MBGLJS_LOCATE@
+        
+    
+		<script>
+            mapboxgl.accessToken = 'pk.eyJ1IjoiYXRkbGxtbmQiLCJhIjoiRGNjUjdiMCJ9.KLP89rmGPw0lv9PVnURKKw';
+            
+            var getJSON = function(url, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'json';
+                xhr.onload = function() {
+                  var status = xhr.status;
+                  if (status === 200) {
+                    callback(null, xhr.response);
+                  } else {
+                    callback(status, xhr.response);
+                  }
+                };
+                xhr.send();
+            };
+            
+            
+            var templateJson = styleJSON;
+            
+            getJSON('https://3dcityplanner.com/ler/mapbox-style.json',
+            function(err, data) {
+              if (err !== null) {
+                alert('Something went wrong: ' + err);
+              } else {
+                //alert('Your query count: ' + data.query.count);
+                
+                var cityplannerJson = data;
+                
+                var mergedObject = {
+                  ...templateJson,
+                  ...cityplannerJson
+                };
+                templateJson.layers.shift();
+                
+                for (let index = 0; index < templateJson.layers.length; index++) {
+                    const layer = templateJson.layers[index];
+                    
+                    if(layer.type == "fill"){
+                        layer.paint["fill-outline-color"] = layer.paint["fill-color"];
+                        layer.paint["fill-opacity"] = 0.5;
+                    }
+    
+                }
+    
+                
+                
+                mergedObject.layers =  cityplannerJson.layers.concat(templateJson.layers);
+                mergedObject.sources = {...cityplannerJson.sources,...templateJson.sources};
+                
+                map.setStyle(mergedObject);
+                map.flyTo({pitch:45});
+              }
+            });
+        </script>
+    </body>
+</html>
