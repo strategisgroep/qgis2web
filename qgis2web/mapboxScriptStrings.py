@@ -196,6 +196,17 @@ def popupScript(safeLayerName, popFuncs, highlight, popupsOnHover):
     sln = "lyr_%s_0" % safeLayerName
     popup = """
 map.on('click', '%s', function (e) {
+    
+    let f = map.queryRenderedFeatures(e.point);
+    if (f.length) {
+        if(f[0].layer.id != '%s'){
+            return;
+        } 
+    } else {
+        return;
+    }
+
+
     var description = %s
 
     new mapboxgl.Popup()
@@ -214,7 +225,7 @@ map.on('mouseleave', '%s', function () {
     map.getCanvas().style.cursor = '';
 });
 
-""" % (sln, popFuncs, sln, sln)
+""" % (sln, sln, popFuncs, sln, sln)
     return popup
 
 
@@ -364,43 +375,45 @@ def addLayersList(basemapList, matchCRS, layer_list, cluster, legends,
     layerName_list = []
     QgsMessageLog.logMessage(str(legends))
     for ct, layer in enumerate(layer_list):
-        
         legendHTML = ("<div class=\"menu-legend\">" + legends[safeName(layer.name()) + "_" + str(ct)] + "</div>")
         sln = ("'lyr_%s_%d_0', '%s"+legendHTML.replace("'", "\'")+"'") % (safeName(layer.name()), ct,
                                        layer.name())
         layerName_list.insert(0, sln)
     layersList = """
-    var toggleableLayerIds = [%s];
+    map.on('load', function(){
+        var toggleableLayerIds = [%s];
 
-    for (var i = 0; i < toggleableLayerIds.length; i=i+2) {
-        var id = toggleableLayerIds[i];
-        var layerName = toggleableLayerIds[i+1]
+        for (var i = 0; i < toggleableLayerIds.length; i=i+2) {
+            var id = toggleableLayerIds[i];
+            var layerName = toggleableLayerIds[i+1]
 
-        var link = document.createElement('a');
-        link.href = '#';
-        link.className = 'active';
-        link.layer = id;
-        link.innerHTML = layerName;
+            var link = document.createElement('a');
+            link.href = '#';
+            var visibility = map.getLayoutProperty(id, 'visibility');
+            if(visibility == 'visible') link.className = 'active';
+            link.layer = id;
+            link.innerHTML = layerName;
 
-        link.onclick = function (e) {
-            var clickedLayer = this.layer;
-            e.preventDefault();
-            e.stopPropagation();
+            link.onclick = function (e) {
+                var clickedLayer = this.layer;
+                e.preventDefault();
+                e.stopPropagation();
 
-            var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+                var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
 
-            if (typeof visibility === 'undefined' || visibility == 'visible') {
-                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-                this.className = '';
-            } else {
-                this.className = 'active';
-                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-            }
-        };
+                if (typeof visibility === 'undefined' || visibility == 'visible') {
+                    map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                    this.className = '';
+                } else {
+                    this.className = 'active';
+                    map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                }
+            };
 
-        var layers = document.getElementById('menu');
-        layers.appendChild(link);
-    }""" % (",".join(layerName_list))
+            var layers = document.getElementById('menu');
+            layers.appendChild(link);
+        }
+    });""" % (",".join(layerName_list))
 
     return layersList
 

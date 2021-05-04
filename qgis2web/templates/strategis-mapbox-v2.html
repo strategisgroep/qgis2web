@@ -24,18 +24,51 @@
             margin: 0;
         }
         </style>
-        <title>Dashboard - @PAGETITLE@</title>
+        <title>@PAGETITLE@</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	    <link href="https://3dcityplanner.com/css/custom.css" rel="stylesheet">
         <link href="https://3dcityplanner.com/ler/dashboard.css" rel="stylesheet">
         <link rel="shortcut icon" type="image/ico" href="https://3dcityplanner.com/images/favicon.ico" /> 
         <style>
+            
+            .mapboxgl-popup-content table {
+                width: 100%;
+            }
+            .mapboxgl-popup-content tr {
+                border-top: 1px solid lightgray;
+            }
+            .mapboxgl-popup-content th {
+                font-weight: 200;
+                padding-right: 10px;
+            }
+            .mapboxgl-popup-content td {
+                color: #00324c;
+            }
+            .mapboxgl-popup-content h6 {
+                padding-bottom: 15px;
+                font-weight: 500;
+                background: white;
+            }
+
+            body, input {
+                font-family: 'Poppins', sans-serif !important;
+            }
+            #sidebar{
+                position: absolute;
+                right: 10px;
+                bottom: 30px;
+                top: 60px;
+                width: 50px;
+                padding: 0;
+            }
             #menu {
                 font-family: 'Poppins', sans-serif !important;
                 overflow: hidden;
-                border-radius: 8px;
-                max-height: 95%;
+                border-radius: 5px;
+                max-height: 100%;
                 overflow-y: auto;
+                top: 0px;
+                right: 0px;
             }
             #menu a::before {content: "◻"; padding-right: 5px;}
             #menu a.active::before {content: "◼"; padding-right: 5px;}
@@ -57,13 +90,13 @@
     <body>
         <div class="h-100 w-100">
             <nav class="navbar navbar-expand-lg navbar-light white-bg px-5" >
-                    <a class="navbar-brand" href="/ler"><img src="https://3dcityplanner.com/images/logo_strategis_ter.png" class="img-fluid" alt=""></a>
+                    <a class="navbar-brand"><img src="https://3dcityplanner.com/images/dwa_strategis_roosemalen.png" class="img-fluid" alt=""></a>
                     <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="">
                         <ul class="navbar-nav mr-auto">
-                            <li class="nav-item"><div class="nav-link scroll-link" style="pointer-events:none;"><h3>Dashboard - @PAGETITLE@</h3></div></li>
+                            <li class="nav-item"><div class="nav-link scroll-link" style="pointer-events:none;"><h3>@PAGETITLE@</h3></div></li>
                         </ul>
                     </div>
             </nav>

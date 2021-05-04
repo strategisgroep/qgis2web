@@ -135,7 +135,7 @@ def writeHTMLstart(outputIndex, webpage_name, cluster_set, address, measure,
               "@EXP_JS@": exp_js,
               "@OL3_BACKGROUNDCOLOR@": "",
               "@OL3_STYLEVARS@": "",
-              "@OL3_POPUP@": """<nav id="menu"></nav>
+              "@OL3_POPUP@": """<div id="sidebar"><nav id="menu"></nav></div>
               <div id="distance" class="distance-container"></div>""",
               "@OL3_GEOJSONVARS@": "",
               "@OL3_WFSVARS@": "",

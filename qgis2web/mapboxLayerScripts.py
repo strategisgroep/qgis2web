@@ -114,7 +114,10 @@ def writeVectorLayer(layer, safeLayerName, usedFields, highlight,
                 if layout["text-font"]:
                     layout["text-font"] = ["Open Sans Regular"]
             except:
-                layout = "{}"
+                if visible:
+                    layout = "{\"visibility\":\"visible\"}"
+                else:
+                    layout = "{\"visibility\":\"none\"}"
             layers.append("""
         {
             "id": "lyr_%s_%d",
@@ -162,7 +165,10 @@ def writeVectorLayer(layer, safeLayerName, usedFields, highlight,
                     if layout["text-font"]:
                         layout["text-font"] = ["Open Sans Regular"]
                 except:
-                    layout = "{}"
+                    if visible:
+                        layout = "{\"visibility\":\"visible\"}"
+                    else:
+                        layout = "{\"visibility\":\"none\"}"
                 paint = mblayer["paint"]
                 layers.append("""
         {
