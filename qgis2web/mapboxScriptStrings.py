@@ -431,7 +431,7 @@ def addressSearchScript():
         var params = { format: "json", q: query, limit: options.limit };
         var urlParams = new URLSearchParams(Object.entries(params));
 
-        return fetch("http://nominatim.openstreetmap.org/search?" + urlParams)
+        return fetch("https://nominatim.openstreetmap.org/search?" + urlParams)
             .then(function(response) {
                 if(response.ok) {
                     return response.json();
