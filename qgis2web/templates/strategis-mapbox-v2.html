@@ -173,6 +173,11 @@
         
     
 		<script>
+            $('#modal-details-content').empty();
+            $('#modal-details-text').empty();
+            $('#modal-details-holder').css("maxWidth","1200px");
+            $('#modal-details-content').html(titleData);
+            $("#modal-details").modal('show');
             mapboxgl.accessToken = 'pk.eyJ1IjoiYXRkbGxtbmQiLCJhIjoiRGNjUjdiMCJ9.KLP89rmGPw0lv9PVnURKKw';
             
             var getJSON = function(url, callback) {

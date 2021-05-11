@@ -362,19 +362,6 @@ def titleSubScript(webmap_head):
 
 def addLayersList(basemapList, matchCRS, layer_list, groups, cluster, legends,
                   collapsed):
-    
-    QgsMessageLog.logMessage("logging groups")
-    QgsMessageLog.logMessage(str(groups))
-
-    (groupVars, groupedLayers) = buildGroups(groups, False)
-
-
-    QgsMessageLog.logMessage("logging groupVars")
-    QgsMessageLog.logMessage(str(groupVars))
-    QgsMessageLog.logMessage("logging groupedLayers")
-    QgsMessageLog.logMessage(str(groupedLayers))
-
-
     groupName_list = []
 
     groupedLayers = {}
