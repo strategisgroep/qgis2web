@@ -95,6 +95,7 @@ class MapboxWriter(Writer):
             iface,
             feedback,
             layer_list=self.layers,
+            groups=self.groups,
             popup=self.popup,
             visible=self.visible,
             json=self.json,
@@ -112,7 +113,7 @@ class MapboxWriter(Writer):
     @classmethod
     def writeMapbox(
             cls, iface, feedback, folder,
-            layer_list, visible, cluster,
+            layer_list, groups, visible, cluster,
             json, getFeatureInfo, params, popup):
         outputProjectFileName = folder
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
@@ -122,6 +123,7 @@ class MapboxWriter(Writer):
         project = QgsProject.instance()
         mapSettings = canvas.mapSettings()
         title = project.title()
+        abstract = project.metadata().abstract()
         pluginDir = os.path.dirname(os.path.realpath(__file__))
         stamp = datetime.now().strftime("%Y_%m_%d-%H_%M_%S_%f")
         outputProjectFileName = os.path.join(outputProjectFileName,
@@ -136,6 +138,7 @@ class MapboxWriter(Writer):
         restrictToExtent = params["Scale/Zoom"]["Restrict to extent"]
         matchCRS = params["Appearance"]["Match project CRS"]
         addressSearch = params["Appearance"]["Add address search"]
+        abstractOptions = params["Appearance"]["Add abstract"]
         locate = params["Appearance"]["Geolocate user"]
         measure = params["Appearance"]["Measure tool"]
         highlight = params["Appearance"]["Highlight on hover"]
@@ -344,11 +347,14 @@ var styleJSON = {
                        '<a href="https://qgis.org" target="_blank">QGIS</a>'
                        )
         layersList = ""
+        abstractStart = ""
+        if abstract != "":
+            abstractStart = titleSubScript(abstract)
         if (params["Appearance"]["Add layers list"] and
                 params["Appearance"]["Add layers list"] != "" and
                 params["Appearance"]["Add layers list"] != "None"):
             layersList = addLayersList(
-                [], matchCRS, layer_list, cluster, legends,
+                [], matchCRS, layer_list, groups, cluster, legends,
                 params["Appearance"]["Add layers list"] == "Expanded")
         if addressSearch:
             addressSearchCode = addressSearchScript()
@@ -358,6 +364,7 @@ var styleJSON = {
 <script src="./mapbox/style.js"></script>
 <script src="./js/Autolinker.min.js"></script>
 <script>
+%s
 var map = new mapboxgl.Map({
  container: 'map',
  style: styleJSON,
@@ -373,7 +380,7 @@ map.addControl(new mapboxgl.AttributionControl({
 }));
 var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 %s
-%s%s</script>""" % (center, zoom, bearing, attribution, popupCode, layersList,
+%s%s</script>""" % (abstractStart, center, zoom, bearing, attribution, popupCode, layersList,
                     addressSearchCode)
         # try:
         writeHTMLstart(outputIndex, title, cluster, addressSearch, measure,

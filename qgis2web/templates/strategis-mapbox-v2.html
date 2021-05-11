@@ -30,7 +30,6 @@
         <link href="https://3dcityplanner.com/ler/dashboard.css" rel="stylesheet">
         <link rel="shortcut icon" type="image/ico" href="https://3dcityplanner.com/images/favicon.ico" /> 
         <style>
-            
             .mapboxgl-popup-content table {
                 width: 100%;
             }
@@ -69,21 +68,49 @@
                 overflow-y: auto;
                 top: 0px;
                 right: 0px;
+                width: 400px;
+                border: 0;
+                
+                box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
             }
             #menu a::before {content: "◻"; padding-right: 5px;}
             #menu a.active::before {content: "◼"; padding-right: 5px;}
-            #menu a .menu-legend{
-                border-top: 1px solid lightgrey;
+            #menu a > .menu-legend{
+                border-top: 2px solid rgba(0, 0, 0, 0.1);
                 padding-top:5px;
                 margin-left:20px;
                 margin-top:5px;
                 display: none;
+                font-weight: 400;
+                color: #404040;
             }
-            #menu a.active .menu-legend{
+            #menu a.active > .menu-legend{
                 display: block;
             }
+
+            #menu a > a{
+                display: none;
+                font-weight: 400!important;
+                background-color: transparent!important;
+                border-top: 0;
+                border-bottom: 0;
+                margin-right:20px;
+                margin-left:20px;
+            }
+            #menu a {
+                font-weight: 400;
+                border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+            }
+            #menu a.active {
+                font-weight: bold;
+                color:#00324c;
+            }
+            #menu a.active > a{
+                display: block;
+            }
+
             #menu a.active{
-                background-color: white;
+                background-color: transparent!important;
             }
         </style>
     </head>

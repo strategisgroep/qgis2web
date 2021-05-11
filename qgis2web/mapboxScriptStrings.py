@@ -1,6 +1,7 @@
 import re
 import os
 import traceback
+import json
 from urllib.parse import parse_qs
 from PyQt5.QtCore import QSize
 from qgis.core import (QgsProject,
@@ -355,33 +356,69 @@ def rasterScript(layer, safeLayerName, count):
 
 
 def titleSubScript(webmap_head):
-    titleSub = """
-        var title = new L.Control();
-        title.onAdd = function (map) {
-            this._div = L.DomUtil.create('div', 'info');
-            this.update();
-            return this._div;
-        };
-        title.update = function () {
-            this._div.innerHTML = '<h2>"""
-    titleSub += webmap_head.replace("'", "\\'") + """</h2>';
-        };
-        title.addTo(map);"""
+    titleSub = "var titleData = " + json.dumps(webmap_head).replace("'", "\\'") + ";"
     return titleSub
 
 
-def addLayersList(basemapList, matchCRS, layer_list, cluster, legends,
+def addLayersList(basemapList, matchCRS, layer_list, groups, cluster, legends,
                   collapsed):
+    
+    QgsMessageLog.logMessage("logging groups")
+    QgsMessageLog.logMessage(str(groups))
+
+    (groupVars, groupedLayers) = buildGroups(groups, False)
+
+
+    QgsMessageLog.logMessage("logging groupVars")
+    QgsMessageLog.logMessage(str(groupVars))
+    QgsMessageLog.logMessage("logging groupedLayers")
+    QgsMessageLog.logMessage(str(groupedLayers))
+
+
+    groupName_list = []
+
+    groupedLayers = {}
+    for group, groupLayers in groups.items():
+        groupLayerObjs = ""
+        groupList = []
+        groupedLayers[group] = groupList
+
     layerName_list = []
-    QgsMessageLog.logMessage(str(legends))
     for ct, layer in enumerate(layer_list):
+        
+        found = False
+
+        for group, groupLayers in groups.items():
+            for layer2 in groupLayers:
+                if layer == layer2:
+
+                    legendHTML = ("<div class=\"menu-legend\">" + legends[safeName(layer.name()) + "_" + str(ct)] + "</div>")
+                    sln = ("lyr_%s_%d_0") % (safeName(layer.name()), ct)
+                    sln2 = layer.name() + legendHTML.replace("'", "\'")
+                    groupedLayers[group].insert(0, sln2)
+                    groupedLayers[group].insert(0, sln)
+
+                    QgsMessageLog.logMessage("layer found in group: " + layer.name())
+                    found = True
+                    break
+            
+            if found == True: break
+        if found == True: continue
+
         legendHTML = ("<div class=\"menu-legend\">" + legends[safeName(layer.name()) + "_" + str(ct)] + "</div>")
         sln = ("'lyr_%s_%d_0', '%s"+legendHTML.replace("'", "\'")+"'") % (safeName(layer.name()), ct,
                                        layer.name())
         layerName_list.insert(0, sln)
+
+    
+    QgsMessageLog.logMessage("logging groupedLayers")
+    QgsMessageLog.logMessage(json.dumps(groupedLayers))
+
+
     layersList = """
     map.on('load', function(){
         var toggleableLayerIds = [%s];
+        var toggleableGroups = %s;
 
         for (var i = 0; i < toggleableLayerIds.length; i=i+2) {
             var id = toggleableLayerIds[i];
@@ -413,7 +450,75 @@ def addLayersList(basemapList, matchCRS, layer_list, cluster, legends,
             var layers = document.getElementById('menu');
             layers.appendChild(link);
         }
-    });""" % (",".join(layerName_list))
+
+        for (var groupName in toggleableGroups) {
+            console.log(groupName);
+
+            let link = document.createElement('a');
+            link.href = '#';
+            var visibility = map.getLayoutProperty(toggleableGroups[groupName][0], 'visibility');
+            if(visibility == 'visible') link.className = 'active';
+            link.innerHTML = groupName;
+
+            // Group click
+            link.onclick = function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if(this.className == "active"){
+                    this.className = "";
+                    for(var j = 0; j < link.children.length; j++){
+                        link2 = link.children[j];
+                        map.setLayoutProperty(link2.layer, 'visibility', 'none');
+                    }
+                } 
+                else{
+                    this.className = "active";
+                    for(var j = 0; j < link.children.length; j++){
+                        link2 = link.children[j];
+                        if(link2.className == "active"){
+                            map.setLayoutProperty(link2.layer, 'visibility', 'visible');
+                        }
+                    }
+                }  
+            };
+
+
+            var layers = document.getElementById('menu');
+            layers.appendChild(link);
+
+            //subitem click
+            for (var i = 0; i < toggleableGroups[groupName].length; i=i+2) {
+                var id = toggleableGroups[groupName][i];
+                var layerName = toggleableGroups[groupName][i+1]
+
+                var link2 = document.createElement('a');
+                link2.href = '#';
+                var visibility = map.getLayoutProperty(id, 'visibility');
+                if(visibility == 'visible') link2.className = 'active';
+                link2.layer = id;
+                link2.innerHTML = layerName;
+
+                link2.onclick = function (e) {
+                    var clickedLayer = this.layer;
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+                    if (typeof visibility === 'undefined' || visibility == 'visible') {
+                        map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                        this.className = '';
+                    } else {
+                        this.className = 'active';
+                        map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                    }
+                };
+
+                link.appendChild(link2);
+            }
+        }
+    });""" % (",".join(layerName_list), json.dumps(groupedLayers))
 
     return layersList
 
