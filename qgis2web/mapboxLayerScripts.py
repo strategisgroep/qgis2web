@@ -326,51 +326,43 @@ def getPopups(layer, safeLayerName, highlight, popupsOnHover, popup, vts):
     field_names = popup.keys()
     field_vals = popup.values()
     table = ""
-    for field in popup:
-        tablestart = "'<h6>" + layer.name() + "</h6><table>\\"
-        row = ""
-        for field, val in zip(field_names, field_vals):
-            fieldIndex = fields.indexFromName(unicode(field))
-            editorWidget = layer.editorWidgetSetup(fieldIndex).type()
-            displayName = layer.attributeDisplayName(fieldIndex).replace("'",
-                                                                         "\\'")
-            if (editorWidget == 'Hidden'):
-                continue
+    
+    tablestart = "'<h6>" + layer.name() + "</h6><table>\\"
+    row = ""
 
-            row += """
-                    <tr>\\"""
-            if val == 'inline label':
-                row += """
-                        <th scope="row">"""
-                row += displayName
-                row += """</th>\\
-                        <td>"""
-            else:
-                row += """
-                        <td colspan="2">"""
-            if val == "header label":
-                row += '<strong>'
-                row += displayName
-                row += '</strong><br />'
-            row += "' + "
-            row += "(e.features[0].properties[\'" + unicode(field) + "\'] "
-            row += "!== null ? "
+    for field in fields:
+        fieldName = field.name()
+        fieldIndex = fields.indexFromName(unicode(fieldName))
+        editorWidget = layer.editorWidgetSetup(fieldIndex).type()
+        displayName = layer.attributeDisplayName(fieldIndex).replace("'", "\\'")
 
-            if (editorWidget == 'Photo'):
-                row += "'<img src=\"images/' + "
-                row += "String(e.features[0].properties['" + unicode(field)
-                row += r"']).replace(/[\\\/:]/g, '_').trim()"
-                row += " + '\">' : '') + '"
-            else:
-                row += "autolinker.link("
-                row += "e.features[0].properties['" + unicode(field)
-                row += "'].toLocaleString()) : '') + '"
+        row += """
+                <th scope="row">"""
+        row += displayName
+        row += """</th>\\
+                <td>"""
 
-            row += """</td>\\
-                    </tr>\\"""
-        tableend = """
-                </table>'"""
-        table = tablestart + row + tableend
+        row += "' + "
+        row += "(e.features[0].properties[\'" + unicode(fieldName) + "\'] "
+        row += "!== null ? "
+
+        if (editorWidget == 'Photo'):
+            row += "'<img src=\"images/' + "
+            row += "String(e.features[0].properties['" + unicode(fieldName)
+            row += r"']).replace(/[\\\/:]/g, '_').trim()"
+            row += " + '\">' : '') + '"
+        else:
+            row += "autolinker.link("
+            row += "e.features[0].properties['" + unicode(fieldName)
+            row += "'].toLocaleString()) : '') + '"
+        
+        row += """</td>\\
+                </tr>\\"""
+    
+    tableend = """
+            </table>'"""
+    table = tablestart + row + tableend
+
     new_pop = ""
     if popup != 0 and table != "":
         new_pop = popupScript(safeLayerName, table, highlight, popupsOnHover)
