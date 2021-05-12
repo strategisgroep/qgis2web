@@ -343,10 +343,7 @@
                     
                     var cityplannerJson = data;
                     
-                    var mergedObject = {
-                    ...templateJson,
-                    ...cityplannerJson
-                    };
+                    var mergedObject = cityplannerJson;
                     templateJson.layers.shift();
                     
                     for (let index = 0; index < templateJson.layers.length; index++) {
@@ -360,10 +357,11 @@
                     }
         
                     
-                    
                     mergedObject.layers =  cityplannerJson.layers.concat(templateJson.layers);
-                    mergedObject.sources = {...cityplannerJson.sources,...templateJson.sources};
-                    
+                    for(source in templateJson.sources){
+                        mergedObject.sources[source] = templateJson.sources[source];
+                    }
+
                     map.setStyle(mergedObject);
                     map.flyTo({pitch:45});
                 }
