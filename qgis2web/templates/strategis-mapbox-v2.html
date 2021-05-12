@@ -33,6 +33,12 @@
         <link href="https://3dcityplanner.com/ler/dashboard.css" rel="stylesheet">
         <link rel="shortcut icon" type="image/ico" href="https://3dcityplanner.com/images/favicon.ico" /> 
         <style>
+            .mapboxgl-ctrl-generic-geocoder{
+                width:400px;
+                min-width:150px;
+                max-width: 85vw;
+            }
+
             .mapboxgl-popup-content table {
                 width: 100%;
             }
@@ -71,9 +77,10 @@
                 overflow-y: auto;
                 top: 0px;
                 right: 0px;
-                width: 400px;
+                width:400px;
+                min-width:150px;
+                max-width: 85vw;
                 border: 0;
-                max-width: 90vw;
                 box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
             }
             #menu a::before {content: "◻"; padding-right: 5px;}
