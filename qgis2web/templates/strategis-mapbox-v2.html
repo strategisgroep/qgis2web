@@ -252,8 +252,8 @@
             
             map.on('load', function(){
                 $("#sidebar").addClass("leaflet-control-layers");
-                $("#sidebar").prepend($('<a class="leaflet-control-layers-toggle" href="#" title="Layers"></a>'));
-                $("#menu").addClass("leaflet-control-layers-list");
+                $("#sidebar").prepend($('<a class="leaflet-control-layers-toggle d-md-none" href="#" title="Layers"></a>'));
+                $("#menu").addClass("leaflet-control-layers-list d-md-block");
 
                 $(".leaflet-control-layers").mouseenter(function() {
                     $(".leaflet-control-layers").addClass("leaflet-control-layers-expanded");
