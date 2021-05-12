@@ -187,6 +187,51 @@
         </style>
     </head>
     <body>
+        <div class="modal fade p-0" id="modal-ie" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+            <div class="modal-dialog m-2 my-lg-5" role="document" style="display:flex; max-width:100%;">
+                <div class="login-form-holder" style="pointer-events: auto; position:relative; width: 1000px; max-width:1000px;">
+                    <div class="inner">
+                        <div class="login-form">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-6 pb-5">
+                                        <h3>Melding voor Internet Explorer gebruikers</h3>
+                                        <br>
+                                        <p>U probeert de kaart te openen in Internet Explorer. Echter wordt deze browser niet meer ondersteund en kunnen wij hierdoor niet de nieuwste technieken toepassen die voor de weergave nodig zijn.</p>
+                                        <br>
+                                        <p>Om de kaart te kunnen bekijken raden wij aan om een andere moderne browser te gebruiken.<br><br>Wellicht heeft u al Chrome, Firefox of Edge op uw computer staan, Zo niet dan kunt u een <b>nieuwe browser downloaden en installeren</b> via de volgende knoppen:</p>
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="row justify-content-center pt-4 text-center">
+                                    <div class="col-6 col-md-3">
+                                        <a href="https://www.google.com/chrome/" target="_blank">
+                                            <img src="https://3dcityplanner.com/images/chrome.jpg" style="width:100px;"/>
+                                            <br>
+                                            Google Chrome
+                                        </a>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <a href="https://www.mozilla.org/firefox/new/" target="_blank">
+                                            <img src="https://3dcityplanner.com/images/firefox.jpg" style="width:100px;"/>
+                                            <br>
+                                            Mozilla Firefox
+                                        </a>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <a href="https://www.microsoft.com/edge" target="_blank">
+                                            <img src="https://3dcityplanner.com/images/edge.jpg" style="width:100px;"/>
+                                            <br>
+                                            Microsoft Edge
+                                        </a>
+                                    </div>
+                                </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="modal fade p-0" id="modal-details" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog m-2 my-lg-5" role="document" style="display:flex; max-width:100%;">
                 <div class="login-form-holder mw-100" style="pointer-events: auto; position:relative">
@@ -247,76 +292,83 @@
             $('#modal-details-holder').css("maxWidth","1200px");
             $('#modal-details-content').html(titleData);
             $("#modal-details").modal('show');
-            mapboxgl.accessToken = 'pk.eyJ1IjoiYXRkbGxtbmQiLCJhIjoiRGNjUjdiMCJ9.KLP89rmGPw0lv9PVnURKKw';
-            
-            
-            map.on('load', function(){
-                $("#sidebar").addClass("leaflet-control-layers");
-                $("#sidebar").prepend($('<a class="leaflet-control-layers-toggle d-md-none" href="#" title="Layers"></a>'));
-                $("#menu").addClass("leaflet-control-layers-list d-md-block");
 
-                $(".leaflet-control-layers").mouseenter(function() {
-                    $(".leaflet-control-layers").addClass("leaflet-control-layers-expanded");
+            
+            if (navigator.userAgent.indexOf("MSIE ") > -1 || navigator.userAgent.indexOf("Trident/") > -1){
+                $('#IE-panel').removeClass('d-none');
+                $("#modal-ie").modal({backdrop: 'static', keyboard: false});
+            } else {
+                mapboxgl.accessToken = 'pk.eyJ1IjoiYXRkbGxtbmQiLCJhIjoiRGNjUjdiMCJ9.KLP89rmGPw0lv9PVnURKKw';
+                
+                
+                map.on('load', function(){
+                    $("#sidebar").addClass("leaflet-control-layers");
+                    $("#sidebar").prepend($('<a class="leaflet-control-layers-toggle d-md-none" href="#" title="Layers"></a>'));
+                    $("#menu").addClass("leaflet-control-layers-list d-md-block");
+
+                    $(".leaflet-control-layers").mouseenter(function() {
+                        $(".leaflet-control-layers").addClass("leaflet-control-layers-expanded");
+                    });
+                    $(".leaflet-control-layers").mouseleave(function() {
+                        $(".leaflet-control-layers").removeClass("leaflet-control-layers-expanded");
+                    });
                 });
-                $(".leaflet-control-layers").mouseleave(function() {
-                    $(".leaflet-control-layers").removeClass("leaflet-control-layers-expanded");
-                });
-            });
 
 
 
-            var getJSON = function(url, callback) {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', url, true);
-                xhr.responseType = 'json';
-                xhr.onload = function() {
-                  var status = xhr.status;
-                  if (status === 200) {
-                    callback(null, xhr.response);
-                  } else {
-                    callback(status, xhr.response);
-                  }
-                };
-                xhr.send();
-            };
-            
-            
-            var templateJson = styleJSON;
-            
-            getJSON('https://3dcityplanner.com/ler/mapbox-style.json',
-            function(err, data) {
-              if (err !== null) {
-                alert('Something went wrong: ' + err);
-              } else {
-                //alert('Your query count: ' + data.query.count);
-                
-                var cityplannerJson = data;
-                
-                var mergedObject = {
-                  ...templateJson,
-                  ...cityplannerJson
-                };
-                templateJson.layers.shift();
-                
-                for (let index = 0; index < templateJson.layers.length; index++) {
-                    const layer = templateJson.layers[index];
-                    
-                    if(layer.type == "fill"){
-                        layer.paint["fill-outline-color"] = layer.paint["fill-color"];
-                        layer.paint["fill-opacity"] = 0.5;
+                var getJSON = function(url, callback) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', url, true);
+                    xhr.responseType = 'json';
+                    xhr.onload = function() {
+                    var status = xhr.status;
+                    if (status === 200) {
+                        callback(null, xhr.response);
+                    } else {
+                        callback(status, xhr.response);
                     }
-    
+                    };
+                    xhr.send();
+                };
+                
+                
+                var templateJson = styleJSON;
+                
+                getJSON('https://3dcityplanner.com/ler/mapbox-style.json',
+                function(err, data) {
+                if (err !== null) {
+                    alert('Something went wrong: ' + err);
+                } else {
+                    //alert('Your query count: ' + data.query.count);
+                    
+                    var cityplannerJson = data;
+                    
+                    var mergedObject = {
+                    ...templateJson,
+                    ...cityplannerJson
+                    };
+                    templateJson.layers.shift();
+                    
+                    for (let index = 0; index < templateJson.layers.length; index++) {
+                        const layer = templateJson.layers[index];
+                        
+                        if(layer.type == "fill"){
+                            layer.paint["fill-outline-color"] = layer.paint["fill-color"];
+                            layer.paint["fill-opacity"] = 0.5;
+                        }
+        
+                    }
+        
+                    
+                    
+                    mergedObject.layers =  cityplannerJson.layers.concat(templateJson.layers);
+                    mergedObject.sources = {...cityplannerJson.sources,...templateJson.sources};
+                    
+                    map.setStyle(mergedObject);
+                    map.flyTo({pitch:45});
                 }
-    
-                
-                
-                mergedObject.layers =  cityplannerJson.layers.concat(templateJson.layers);
-                mergedObject.sources = {...cityplannerJson.sources,...templateJson.sources};
-                
-                map.setStyle(mergedObject);
-                map.flyTo({pitch:45});
-              }
-            });
+                });
+            }
         </script>
     </body>
 </html>
