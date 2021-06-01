@@ -428,7 +428,7 @@ def addLayersList(basemapList, matchCRS, layer_list, groups, cluster, legends,
                 $('#modal-details-content').empty();
                 $('#modal-details-text').empty();
                 $('#modal-details-holder').css("maxWidth","800px");
-                $('#modal-details-content').html("<h3>"+name+"</h3><div>" + layerAbstracts[id] + '</div><div class="pt-5"><h6>Legenda</h6>' +layerLegends[id]+ "</div>");
+                $('#modal-details-content').html("<h3>"+name+"</h3><div>" + layerAbstracts[id].replace(/\\n/g, "<br />") + '</div><div class="pt-5"><h6>Legenda</h6>' +layerLegends[id]+ "</div>");
                 $("#modal-details").modal('show');
             } else {
                 console.log("Trying to show info of layer, but modal does not exist.");
