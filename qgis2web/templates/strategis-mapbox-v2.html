@@ -83,8 +83,23 @@
                 border: 0;
                 box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
             }
+
+            #menu a p{
+                display: inline;
+                color:#00324c;
+            }
+
+            #menu a i{
+                position: absolute;
+                right: 10px;
+            }
+            #menu a i:hover{
+                opacity: 0.5;
+            }
+
             #menu a::before {content: "◻"; padding-right: 5px;}
             #menu a.active::before {content: "◼"; padding-right: 5px;}
+
             #menu a > .menu-legend{
                 border-top: 2px solid rgba(0, 0, 0, 0.1);
                 padding-top:5px;
@@ -93,6 +108,7 @@
                 display: none;
                 font-weight: 400;
                 color: #404040;
+                overflow: hidden;
             }
             #menu a.active > .menu-legend{
                 display: block;
@@ -101,19 +117,27 @@
             #menu a > a{
                 display: none;
                 font-weight: 400!important;
-                background-color: transparent!important;
+                background-color: white!important;
                 border-top: 0;
                 border-bottom: 0;
                 margin-right:20px;
                 margin-left:20px;
+                margin-top:10px;
+                border-radius:5px;
+                opacity: 0.75;
+                -webkit-box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.05); 
+                box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.05);
             }
             #menu a {
+                position: relative;
                 font-weight: 400;
                 border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+                background-color: #f0f0f0;
             }
             #menu a.active {
                 font-weight: bold;
                 color:#00324c;
+                opacity: 1;
             }
             #menu a.active > a{
                 display: block;
@@ -122,8 +146,6 @@
             #menu a.active{
                 background-color: transparent!important;
             }
-
-            
             .leaflet-control-layers {
                 box-shadow: 0 1px 5px rgba(0,0,0,0.4);
                 background: #fff;
@@ -200,9 +222,7 @@
                                         <br>
                                         <p>Om de kaart te kunnen bekijken raden wij aan om een andere moderne browser te gebruiken.<br><br>Wellicht heeft u al Chrome, Firefox of Edge op uw computer staan, Zo niet dan kunt u een <b>nieuwe browser downloaden en installeren</b> via de volgende knoppen:</p>
                                     </div>
-                                    
                                 </div>
-                                
                                 <div class="row justify-content-center pt-4 text-center">
                                     <div class="col-6 col-md-3">
                                         <a href="https://www.google.com/chrome/" target="_blank">
@@ -236,7 +256,7 @@
             <div class="modal-dialog m-2 my-lg-5" role="document" style="display:flex; max-width:100%;">
                 <div class="login-form-holder mw-100" style="pointer-events: auto; position:relative">
                     <div class="inner">
-                        <div class="login-form" id="modal-details-holder">
+                        <div class="login-form" id="modal-details-holder" style="min-width:40vw">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                             <div id="modal-details-content">
 
@@ -248,15 +268,39 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade p-0" id="modal-form" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog m-2 my-lg-5" role="document" style="display:flex; max-width:100%;">
+                <div class="login-form-holder mw-100" style="pointer-events: auto; position:relative">
+                    <div class="inner">
+                        <div class="login-form" id="modal-form-holder" style="min-width:40vw">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                            <div id="modal-form-content">
+                                <h3>Opmerkingen en Feedback</h3>
+                                <script type="text/javascript" src="https://strategisgroep.nl/mautic/form/generate.js?id=4"></script>
+                            </div>
+                            <br>
+                            <a href="#" data-dismiss="modal" aria-label="Close">Sluit venster</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="h-100 w-100">
-            <nav class="navbar navbar-expand-lg navbar-light white-bg px-5" >
-                    <a class="navbar-brand"><img src="https://3dcityplanner.com/images/dwa_strategis_roosemalen.png" class="img-fluid" alt=""></a>
+            <nav class="navbar navbar-expand-lg navbar-light white-bg px-3" style="z-index:5; min-height:86px;" >
+                    <a class="navbar-brand d-none d-lg-block">
+                        <img src="https://3dcityplanner.com/images/dwa_strategis_roosemalen.png" class="img-fluid" alt="">
+                    </a>
+                    <ul class="navbar-nav w-75">
+                        <li class="nav-item"><div class="nav-link scroll-link" style="pointer-events:none;"><h4>@PAGETITLE@</h4></div></li>
+                    </ul>
                     <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="">
-                        <ul class="navbar-nav mr-auto">
-                            <li class="nav-item"><div class="nav-link scroll-link" style="pointer-events:none;"><h3>@PAGETITLE@</h3></div></li>
+                    <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="flex-basis: 70%;">
+                        <ul class="navbar-nav py-4 py-md-0">
+                            <li class="nav-item"><a href="#" class="nav-link scroll-link" onclick="ShowIntroPopup()">Hoe werkt het?</a></li>
+                            <li class="nav-item"><a href="#" class="nav-link scroll-link" onclick="ShowFeedbackPopup()"><p></p>Opmerkingen / Feedback</a></li>
+                            <li class="nav-item"><a href="#" class="d-lg-none pt-5"><img src="https://3dcityplanner.com/images/dwa_strategis_roosemalen.png"  class="img-fluid pl-3 py-3" alt="" width="200"></a></li>
                         </ul>
                     </div>
             </nav>
@@ -286,25 +330,37 @@
         @OL3_WFSVARS@@MBGLJS_MEASURE@@MBGLJS_LOCATE@
         
     
+		
 		<script>
-            $('#modal-details-content').empty();
-            $('#modal-details-text').empty();
-            $('#modal-details-holder').css("maxWidth","1200px");
-            $('#modal-details-content').html(titleData);
-            $("#modal-details").modal('show');
 
-            
+
+            ShowIntroPopup();
+
+            function ShowIntroPopup(){
+                $('#modal-details-content').empty();
+                $('#modal-details-text').empty();
+                $('#modal-details-holder').css("maxWidth","1200px");
+                $('#modal-details-content').html(titleData);
+                $("#modal-details").modal('show');
+            }
+
+            function ShowFeedbackPopup(){
+                $('#modal-form-holder').css("maxWidth","800px");
+                $("#modal-form").modal('show');
+            }
+
+
+
+
             if (navigator.userAgent.indexOf("MSIE ") > -1 || navigator.userAgent.indexOf("Trident/") > -1){
                 $('#IE-panel').removeClass('d-none');
                 $("#modal-ie").modal({backdrop: 'static', keyboard: false});
             } else {
                 mapboxgl.accessToken = 'pk.eyJ1IjoiYXRkbGxtbmQiLCJhIjoiRGNjUjdiMCJ9.KLP89rmGPw0lv9PVnURKKw';
-                
-                
                 map.on('load', function(){
                     $("#sidebar").addClass("leaflet-control-layers");
-                    $("#sidebar").prepend($('<a class="leaflet-control-layers-toggle d-md-none" href="#" title="Layers"></a>'));
-                    $("#menu").addClass("leaflet-control-layers-list d-md-block");
+                    $("#sidebar").prepend($('<a class="leaflet-control-layers-toggle d-lg-none" href="#" title="Layers"></a>'));
+                    $("#menu").addClass("leaflet-control-layers-list d-lg-block");
 
                     $(".leaflet-control-layers").mouseenter(function() {
                         $(".leaflet-control-layers").addClass("leaflet-control-layers-expanded");
@@ -313,9 +369,6 @@
                         $(".leaflet-control-layers").removeClass("leaflet-control-layers-expanded");
                     });
                 });
-
-
-
                 var getJSON = function(url, callback) {
                     var xhr = new XMLHttpRequest();
                     xhr.open('GET', url, true);
@@ -330,33 +383,23 @@
                     };
                     xhr.send();
                 };
-                
-                
                 var templateJson = styleJSON;
-                
                 getJSON('https://3dcityplanner.com/ler/mapbox-style.json',
                 function(err, data) {
                 if (err !== null) {
                     alert('Something went wrong: ' + err);
                 } else {
                     //alert('Your query count: ' + data.query.count);
-                    
                     var cityplannerJson = data;
-                    
                     var mergedObject = cityplannerJson;
                     templateJson.layers.shift();
-                    
                     for (let index = 0; index < templateJson.layers.length; index++) {
                         const layer = templateJson.layers[index];
-                        
                         if(layer.type == "fill"){
                             layer.paint["fill-outline-color"] = layer.paint["fill-color"];
                             layer.paint["fill-opacity"] = 0.5;
                         }
-        
                     }
-        
-                    
                     mergedObject.layers =  cityplannerJson.layers.concat(templateJson.layers);
                     for(source in templateJson.sources){
                         mergedObject.sources[source] = templateJson.sources[source];

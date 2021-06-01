@@ -362,7 +362,6 @@ def titleSubScript(webmap_head):
 
 def addLayersList(basemapList, matchCRS, layer_list, groups, cluster, legends,
                   collapsed):
-    groupName_list = []
 
     groupedLayers = {}
     for group, groupLayers in groups.items():
@@ -371,19 +370,31 @@ def addLayersList(basemapList, matchCRS, layer_list, groups, cluster, legends,
         groupedLayers[group] = groupList
 
     layerName_list = []
+    layer_abstracts = {}
+    layer_legends = {}
+
+    
+
     for ct, layer in enumerate(layer_list):
         
+        layer_id = ("lyr_%s_%d_0") % (safeName(layer.name()), ct)
+
         found = False
+
+        legendHTML = ("<div class=\"menu-legend\">" + legends[safeName(layer.name()) + "_" + str(ct)] + "</div>")
+
+
+        layer_abstracts[layer_id] = layer.metadata().abstract()
+        layer_legends[layer_id] = legendHTML
 
         for group, groupLayers in groups.items():
             for layer2 in groupLayers:
                 if layer == layer2:
 
-                    legendHTML = ("<div class=\"menu-legend\">" + legends[safeName(layer.name()) + "_" + str(ct)] + "</div>")
-                    sln = ("lyr_%s_%d_0") % (safeName(layer.name()), ct)
-                    sln2 = layer.name() + legendHTML.replace("'", "\'")
+                    sln2 = layer.name()
+                    
                     groupedLayers[group].insert(0, sln2)
-                    groupedLayers[group].insert(0, sln)
+                    groupedLayers[group].insert(0, layer_id)
 
                     QgsMessageLog.logMessage("layer found in group: " + layer.name())
                     found = True
@@ -391,50 +402,90 @@ def addLayersList(basemapList, matchCRS, layer_list, groups, cluster, legends,
             
             if found == True: break
         if found == True: continue
+        
 
         legendHTML = ("<div class=\"menu-legend\">" + legends[safeName(layer.name()) + "_" + str(ct)] + "</div>")
-        sln = ("'lyr_%s_%d_0', '%s"+legendHTML.replace("'", "\'")+"'") % (safeName(layer.name()), ct,
-                                       layer.name())
+        sln = ("'%s', '%s'") % (layer_id, layer.name())
         layerName_list.insert(0, sln)
 
     
-    QgsMessageLog.logMessage("logging groupedLayers")
-    QgsMessageLog.logMessage(json.dumps(groupedLayers))
 
 
     layersList = """
     map.on('load', function(){
         var toggleableLayerIds = [%s];
         var toggleableGroups = %s;
+        var layerLegends = %s;
+        var layerAbstracts = %s;
+
+        function ShowInfoClick(e){
+            e.preventDefault();
+            e.stopPropagation();
+
+            var id = $(this).attr("layerId");
+            var name = $(this).attr("layerName");
+            if(!($('#modal-details-content').length == 0)) {
+                $('#modal-details-content').empty();
+                $('#modal-details-text').empty();
+                $('#modal-details-holder').css("maxWidth","800px");
+                $('#modal-details-content').html("<h3>"+name+"</h3><div>" + layerAbstracts[id] + '</div><div class="pt-5"><h6>Legenda</h6>' +layerLegends[id]+ "</div>");
+                $("#modal-details").modal('show');
+            } else {
+                console.log("Trying to show info of layer, but modal does not exist.");
+            }
+        }
+
+        function ToggleLayer(e){
+            var clickedLayer = this.layer;
+            e.preventDefault();
+            e.stopPropagation();
+
+            var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+            if (typeof visibility === 'undefined' || visibility == 'visible') {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                this.className = '';
+            } else {
+                this.className = 'active';
+                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+            }
+        }
+
+        function CreateLink(id,layerName){
+
+            var hasAbstract = false;
+            if(layerAbstracts[id]) hasAbstract = true;
+
+            var link2 = document.createElement('a');
+            link2.href = '#';
+            var visibility = map.getLayoutProperty(id, 'visibility');
+            if(visibility == 'visible') link2.className = 'active';
+            link2.layer = id;
+
+            if(hasAbstract) link2.innerHTML = "<p>" + layerName + '<i class="fas fa-info-circle"></i></p>' + layerLegends[id];
+            else link2.innerHTML = "<p>" + layerName + "</p>" + layerLegends[id];
+
+            link2.onclick = ToggleLayer;
+
+            if(hasAbstract){
+                var infoLink = $(link2).find('i');
+                infoLink.attr("layerId",id);
+                infoLink.attr("layerName",layerName);
+
+                infoLink.click(ShowInfoClick);
+            }
+
+            return link2;
+        }
+
+        var layers = document.getElementById('menu');
 
         for (var i = 0; i < toggleableLayerIds.length; i=i+2) {
             var id = toggleableLayerIds[i];
             var layerName = toggleableLayerIds[i+1]
 
-            var link = document.createElement('a');
-            link.href = '#';
-            var visibility = map.getLayoutProperty(id, 'visibility');
-            if(visibility == 'visible') link.className = 'active';
-            link.layer = id;
-            link.innerHTML = layerName;
+            var link = CreateLink(id,layerName);
 
-            link.onclick = function (e) {
-                var clickedLayer = this.layer;
-                e.preventDefault();
-                e.stopPropagation();
-
-                var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
-
-                if (typeof visibility === 'undefined' || visibility == 'visible') {
-                    map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-                    this.className = '';
-                } else {
-                    this.className = 'active';
-                    map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-                }
-            };
-
-            var layers = document.getElementById('menu');
             layers.appendChild(link);
         }
 
@@ -445,7 +496,7 @@ def addLayersList(basemapList, matchCRS, layer_list, groups, cluster, legends,
             link.href = '#';
             var visibility = map.getLayoutProperty(toggleableGroups[groupName][0], 'visibility');
             if(visibility == 'visible') link.className = 'active';
-            link.innerHTML = groupName;
+            link.innerHTML = "<p>" + groupName + "</p>";
 
             // Group click
             link.onclick = function (e) {
@@ -469,43 +520,21 @@ def addLayersList(basemapList, matchCRS, layer_list, groups, cluster, legends,
                     }
                 }  
             };
-
-
             var layers = document.getElementById('menu');
             layers.appendChild(link);
 
-            //subitem click
+            //actual layer in group
             for (var i = 0; i < toggleableGroups[groupName].length; i=i+2) {
+
                 var id = toggleableGroups[groupName][i];
                 var layerName = toggleableGroups[groupName][i+1]
 
-                var link2 = document.createElement('a');
-                link2.href = '#';
-                var visibility = map.getLayoutProperty(id, 'visibility');
-                if(visibility == 'visible') link2.className = 'active';
-                link2.layer = id;
-                link2.innerHTML = layerName;
-
-                link2.onclick = function (e) {
-                    var clickedLayer = this.layer;
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
-
-                    if (typeof visibility === 'undefined' || visibility == 'visible') {
-                        map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-                        this.className = '';
-                    } else {
-                        this.className = 'active';
-                        map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-                    }
-                };
-
+                var link2 = CreateLink(id,layerName);
+                
                 link.appendChild(link2);
             }
         }
-    });""" % (",".join(layerName_list), json.dumps(groupedLayers))
+    });""" % (",".join(layerName_list), json.dumps(groupedLayers), json.dumps(layer_legends), json.dumps(layer_abstracts))
 
     return layersList
 
