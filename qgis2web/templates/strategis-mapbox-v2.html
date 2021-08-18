@@ -405,14 +405,21 @@
                     var cityplannerJson = data;
                     var mergedObject = cityplannerJson;
                     templateJson.layers.shift();
+                    mergedObject.layers = cityplannerJson.layers;
                     for (let index = 0; index < templateJson.layers.length; index++) {
                         const layer = templateJson.layers[index];
                         if(layer.type == "fill"){
                             layer.paint["fill-outline-color"] = layer.paint["fill-color"];
-                            layer.paint["fill-opacity"] = 0.5;
+                            layer.paint["fill-opacity"] = 0.75;
+                        }
+
+                        if(layer.type == "line" || layer.type == "circle"){
+                            mergedObject.layers.push(layer);
+                        } else {
+                            mergedObject.layers.splice(15 + index,0,layer); // add before text data
                         }
                     }
-                    mergedObject.layers =  cityplannerJson.layers.concat(templateJson.layers);
+                    //mergedObject.layers =  cityplannerJson.layers.concat(templateJson.layers);
                     for(source in templateJson.sources){
                         mergedObject.sources[source] = templateJson.sources[source];
                     }
